@@ -1,8 +1,6 @@
 ﻿@page "/Series"
 @inject SerieRepositorio serieRepositorio;
 
-
-
 <div class="container col-12 align-content-center">
     
     <div class="row">
@@ -10,16 +8,15 @@
             <h3 class="text-center">Listas de Series</h3>                                                          
             <hr />
             <div class="d-flex justify-content-end">
-                <btn @onclick="() => {Modal.Open(); escolherCategoria(2);}" class="btn btn-success">Adicionar</btn>
+                <btn @onclick="() => {Modal?.Open(2); serie_selecionada= new();}" class="btn btn-success">Adicionar</btn>
             </div>
             <table class="table table-hover align-middle table-bordered my-3">
               <thead>
-                  <tr class="text-center">
-                  <th class="col-1" scope="col">Id</th>
+                  <tr class="text-center">                  
                   <th class="col-2"scope="col">Titulo</th>
                   <th class="col-1" scope="col">Ano</th>
                   <th class="col-1"scope="col">Genero</th>
-                  <th class="col-4" scope="col">Descrição</th>
+                  <th class="col-5" scope="col">Descrição</th>
                   <th class="col-3"scope="col">Ações</th>
                 </tr>
               </thead>
@@ -29,28 +26,17 @@
                 {
                     @if(serie.Excluido == false)
                     {                       
-                        <tr class="text-center">
-                            <th scope="row">@serie.Id</th>
+                        <tr class="text-center">                            
                             <td>@serie.Titulo</td>
                             <td>@serie.Ano</td>  
                             <td>@serie.Genero.ToString()</td>  
                             <td>@serie.Descricao</td>
                             <td>                                
-                                <BootstrapModal @ref="Modal" Serie="serie_selecionada" Categoria="categoria"
-                                                             AddSerie="AddSerie" EditarSerie="EditarSerie">
-                                    <ModalHead>
-                                        <div class="text-center">
-                                            <h5 ><b>@titulo</b></h5>
-                                        </div>
-                                        
-                                    </ModalHead>
-                                    <ModalBody>
-                                        <FormComponent serie="serie_selecionada"/>                                                                             
-                                    </ModalBody>
-
-                                </BootstrapModal>
-
-                                <button @onclick="() => {Modal.Open(); serie_selecionada = serie; escolherCategoria(1);}" class="btn btn-primary">Editar</button>
+                                <BootstrapModal @ref="Modal" 
+                                Serie="serie_selecionada"
+                                AddSerie="AddSerie" EditarSerie="EditarSerie"/>                                    
+                                
+                                <button @onclick="() => {Modal?.Open(1); serie_selecionada = serie;  }" class="btn btn-primary">Editar</button>
                                 <button @onclick="() => excluirSerie(serie.Id)" class="btn btn-danger">Excluir</button>                                
                             </td>
                         </tr>    
@@ -66,38 +52,26 @@
 
 
 @code {
-    private BootstrapModal Modal { get; set; }
-    public Serie? serie_selecionada { get; set; }
-    public int categoria { get; set; } = 0; //1 - editar - 2 criar
+    private BootstrapModal? Modal { get; set; }
+    public Serie serie_selecionada = new();    
     public string? titulo { get; set; }
-
-    public void escolherCategoria(int escolha)
-    {
-        if(escolha == 1)
-        {
-            titulo = "Editar";
-        }
-        else
-        {
-            titulo = "Criar";
-            serie_selecionada = null;
-        }
-    }
 
     public void excluirSerie(int id)
     {
-        serieRepositorio.Exclui(id);
-        StateHasChanged();
+        serieRepositorio.Exclui(id);       
     }
 
     public void EditarSerie(Serie serie)
     {
         serieRepositorio.Atualiza(serie.Id, serie);
+        StateHasChanged();
     }
 
     public void AddSerie(Serie serie)
     {
+        serie.Id = serieRepositorio.ProximoId();
         serieRepositorio.Insere(serie);
+        StateHasChanged();
     }
 
 }

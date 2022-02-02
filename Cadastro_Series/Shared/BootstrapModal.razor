@@ -2,26 +2,77 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
 
-            <div class="modal-header">
-                @ModalHead                          
+            <div class="modal-header col-12">
+                <div class="container">
+                    @if(Categoria == 1)
+                    {
+                        <h5 class="text-center"><b>Editar</b></h5>
+                    }
+                    else
+                    {
+                        <h5 class="text-center" ><b>Criar</b></h5>                        
+                    }
+                </div>
             </div>
 
             <div class="modal-body">
-                @ModalBody
+                <div class="container ">
+                    <EditForm Model="@Model">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
+                        <div class="form-group row col-12">
+                            <div class="col-8">
+                                <label class="col-form-label fw-bold  ">Titulo</label>
+                                <InputText class="form-control" @bind-Value="Serie.Titulo" placeholder="@Serie?.Titulo"/>    
+                                <ValidationMessage For="@(()=>Serie.Titulo)"/>
+                            </div>
+                            <div class="col-4">
+                                <label class="col-form-label fw-bold col-4">Ano</label>
+                                <InputNumber min="1900" max="2022" class="form-control" @bind-Value="Serie.Ano" placeholder="Serie?.Ano" TValue="Int32"/>                
+                                <ValidationMessage For="@(()=>Serie.Ano)"/>
+                            </div>            
+                        </div>
+
+                        <div class="form-group row col-12 d-flex justify-content-center">
+                            <label class="col-form-label fw-bold">Genero</label>
+                                <InputSelect class="form-control" @bind-Value="@Serie.Genero">
+                                    @foreach(var genero in Enum.GetValues(typeof(Generos)))
+                                    {
+                                        if(Serie.Genero.ToString() == genero.ToString())
+                                        {
+                                            <option value="@genero" selected>@genero</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@genero">@genero</option>    
+                                        }
+                    
+                                    }            
+                                </InputSelect>            
+                        </div>
+
+                        <div class="form-group row col-12">
+                            <label class="col-form-label fw-bold">Descrição</label>
+                            <InputTextArea style="height:150px" class="form-control " @bind-Value="Serie.Descricao" placeholder="@Serie?.Descricao"/>
+                        </div>
+
+                    </EditForm>    
+                 </div>
             </div>
 
             <div class="modal-footer">
                 @if(Categoria == 1)
                 {
-                    <button @onclick="()=>{EditarSerie.InvokeAsync(Serie); Close(); StateHasChanged();}" type="button" class="btn btn-primary">Salvar</button>
+                    <button @onclick="()=>{EditarSerie.InvokeAsync(Serie); Close();}" type="button" class="btn btn-primary">Salvar</button>
                 }
                 else
                 {
-                    <button @onclick="()=>Add_NovaSerie(Serie)" type="button" class="btn btn-primary">Salvar</button>
+                    <button @onclick="()=>{AddSerie.InvokeAsync(Serie);Close();}" type="button" class="btn btn-primary">Salvar</button>
                 }                
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Close()">Close</button>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -34,19 +85,7 @@
 
 @code {
     [Parameter]
-    public Serie Serie { get; set; }
-
-    [Parameter]
-    public int Categoria { get; set; }
-
-    [Parameter]
-    public RenderFragment ModalHead { get; set; }
-
-    [Parameter]
-    public RenderFragment ModalBody { get; set; }
-
-    [Parameter]
-    public RenderFragment ModalFoot { get; set; }
+    public Serie? Serie { get; set; }    
 
     [Parameter]
     public EventCallback<Serie> EditarSerie { get; set; }
@@ -54,25 +93,20 @@
     [Parameter]
     public EventCallback<Serie> AddSerie { get; set; }
 
-    //public Guid Guid = Guid.NewGuid();
+    public Serie Model = new Serie();
+    public int Categoria { get; set; }
     public string ModalDisplay = "none;";
     public string ModalClass = "";
     public bool ShowBackdrop = false;
 
-    public void Add_NovaSerie(Serie serie)
-    {
-        AddSerie.InvokeAsync(serie);
-        Close();
-        StateHasChanged();
-    }
 
-    public void Open()
+    public void Open(int escolha)
     {
         ModalDisplay = "block;";
         ModalClass = "Show";
         ShowBackdrop = true;
-        StateHasChanged();
-        System.Console.WriteLine("abrindo modal: {0} {1} {2}", ModalClass, ModalDisplay, ShowBackdrop);
+        Categoria = escolha;
+        StateHasChanged();              
     }
 
     public void Close()
@@ -80,11 +114,8 @@
         ModalDisplay = "none";
         ModalClass = "";
         ShowBackdrop = false;
-        StateHasChanged();
-        System.Console.WriteLine("fechando modal: {0} {1} {2}", ModalClass, ModalDisplay, ShowBackdrop);
-    }
-
-    
+        StateHasChanged();        
+    }   
     
 
 }

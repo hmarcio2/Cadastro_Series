@@ -1,16 +1,19 @@
 ﻿using Cadastro_Series.Models.Classes;
 using Cadastro_Series.Models.Enum;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace Cadastro_Series.Models
 {
     public class Serie : EntidadeBase
     {       
-        //atributos
+        //atributos        
         public Generos Genero { get; set; }
-        
+        [Required]
+        [MaxLength(30)]
         public string Titulo { get; set; }
         public string Descricao { get; set; }
+        [Required]
+        
         public int Ano { get; set; }
         public bool Excluido { get; set; }
 
