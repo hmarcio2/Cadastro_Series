@@ -1,0 +1,90 @@
+﻿<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                @ModalHead                          
+            </div>
+
+            <div class="modal-body">
+                @ModalBody
+            </div>
+
+            <div class="modal-footer">
+                @if(Categoria == 1)
+                {
+                    <button @onclick="()=>{EditarSerie.InvokeAsync(Serie); Close(); StateHasChanged();}" type="button" class="btn btn-primary">Salvar</button>
+                }
+                else
+                {
+                    <button @onclick="()=>Add_NovaSerie(Serie)" type="button" class="btn btn-primary">Salvar</button>
+                }                
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Close()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@if (ShowBackdrop)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+
+@code {
+    [Parameter]
+    public Serie Serie { get; set; }
+
+    [Parameter]
+    public int Categoria { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalHead { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalBody { get; set; }
+
+    [Parameter]
+    public RenderFragment ModalFoot { get; set; }
+
+    [Parameter]
+    public EventCallback<Serie> EditarSerie { get; set; }
+
+    [Parameter]
+    public EventCallback<Serie> AddSerie { get; set; }
+
+    //public Guid Guid = Guid.NewGuid();
+    public string ModalDisplay = "none;";
+    public string ModalClass = "";
+    public bool ShowBackdrop = false;
+
+    public void Add_NovaSerie(Serie serie)
+    {
+        AddSerie.InvokeAsync(serie);
+        Close();
+        StateHasChanged();
+    }
+
+    public void Open()
+    {
+        ModalDisplay = "block;";
+        ModalClass = "Show";
+        ShowBackdrop = true;
+        StateHasChanged();
+        System.Console.WriteLine("abrindo modal: {0} {1} {2}", ModalClass, ModalDisplay, ShowBackdrop);
+    }
+
+    public void Close()
+    {
+        ModalDisplay = "none";
+        ModalClass = "";
+        ShowBackdrop = false;
+        StateHasChanged();
+        System.Console.WriteLine("fechando modal: {0} {1} {2}", ModalClass, ModalDisplay, ShowBackdrop);
+    }
+
+    
+    
+
+}
