@@ -1,4 +1,5 @@
-﻿<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
+﻿
+<div class="modal @ModalClass" tabindex="-1" role="none" style="display:@ModalDisplay">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
 
@@ -17,25 +18,22 @@
 
             <div class="modal-body">
                 <div class="container ">
-                    <EditForm Model="@Model">
-                        <DataAnnotationsValidator/>
-                        <ValidationSummary/>
+
+                    <EditForm Model="@Model" OnSubmit="FormSubmit">                        
                         <div class="form-group row col-12">
                             <div class="col-8">
                                 <label class="col-form-label fw-bold  ">Titulo</label>
-                                <InputText class="form-control" @bind-Value="Serie.Titulo" placeholder="@Serie?.Titulo"/>    
-                                <ValidationMessage For="@(()=>Serie.Titulo)"/>
+                                <InputText class="form-control" @bind-Value="Model.Titulo" placeholder="@Serie?.Titulo"/>                                    
                             </div>
                             <div class="col-4">
                                 <label class="col-form-label fw-bold col-4">Ano</label>
-                                <InputNumber min="1900" max="2022" class="form-control" @bind-Value="Serie.Ano" placeholder="Serie?.Ano" TValue="Int32"/>                
-                                <ValidationMessage For="@(()=>Serie.Ano)"/>
+                                <InputNumber min="1895" max="2022" class="form-control" @bind-Value="Model.Ano" placeholder="Serie?.Ano" TValue="Int32"/>                                                
                             </div>            
                         </div>
 
                         <div class="form-group row col-12 d-flex justify-content-center">
                             <label class="col-form-label fw-bold">Genero</label>
-                                <InputSelect class="form-control" @bind-Value="@Serie.Genero">
+                                <InputSelect class="form-control" @bind-Value="@Model.Genero">
                                     @foreach(var genero in Enum.GetValues(typeof(Generos)))
                                     {
                                         if(Serie.Genero.ToString() == genero.ToString())
@@ -53,23 +51,22 @@
 
                         <div class="form-group row col-12">
                             <label class="col-form-label fw-bold">Descrição</label>
-                            <InputTextArea style="height:150px" class="form-control " @bind-Value="Serie.Descricao" placeholder="@Serie?.Descricao"/>
+                            <InputTextArea style="height:150px" class="form-control " @bind-Value="Model.Descricao" placeholder="@Serie?.Descricao"/>
                         </div>
-
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
                     </EditForm>    
+
                  </div>
             </div>
 
-            <div class="modal-footer">
-                @if(Categoria == 1)
-                {
-                    <button @onclick="()=>{EditarSerie.InvokeAsync(Serie); Close();}" type="button" class="btn btn-primary">Salvar</button>
-                }
-                else
-                {
-                    <button @onclick="()=>{AddSerie.InvokeAsync(Serie);Close();}" type="button" class="btn btn-primary">Salvar</button>
-                }                
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Close()">Close</button>
+            <div class="modal-footer ">  
+                <div class="row col-12">
+                    <div>
+                        <button type="submit" @onclick=FormSubmit class="btn btn-primary">Salvar</button>                         
+                        <button class="btn btn-secondary" @onclick=Close>Close</button>
+                    </div>
+                </div>    
             </div>
         </div>
 
@@ -93,12 +90,12 @@
     [Parameter]
     public EventCallback<Serie> AddSerie { get; set; }
 
-    public Serie Model = new Serie();
+    public Serie Model => Serie == null ? new Serie() : Serie; //Define Model para o EditForm
     public int Categoria { get; set; }
+        
     public string ModalDisplay = "none;";
-    public string ModalClass = "";
+    public string ModalClass = " ";
     public bool ShowBackdrop = false;
-
 
     public void Open(int escolha)
     {
@@ -112,10 +109,40 @@
     public void Close()
     {
         ModalDisplay = "none";
-        ModalClass = "";
-        ShowBackdrop = false;
-        StateHasChanged();        
-    }   
-    
+        ModalClass = " ";
+        ShowBackdrop = false;               
+    }
 
+
+
+    //FALTA CORRIGIR VALIDAÇÃO DO FORMULÁRIO
+
+    private EditContext? editContext;
+
+    protected override void OnInitialized()
+    {
+        editContext = new(ModalClass);        
+    }
+
+    
+    public void FormSubmit()
+    {
+        if(editContext != null && editContext.Validate())
+        {
+            if(Categoria == 1)
+            {
+                EditarSerie.InvokeAsync(Serie);
+            }
+            else
+            {
+                AddSerie.InvokeAsync(Serie);
+            }  
+            Close();
+        }
+        else
+        {
+            Console.WriteLine("Erro na validação");
+        }
+        
+    }
 }

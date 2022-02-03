@@ -21,8 +21,10 @@
                 </tr>
               </thead>
               <tbody>    
-
-                @foreach(var serie in serieRepositorio.Listar())
+                <BootstrapModal @ref="Modal" 
+                            Serie="serie_selecionada"
+                            AddSerie="AddSerie" EditarSerie="EditarSerie"/>
+                @foreach(var serie in ExibirSerie())
                 {
                     @if(serie.Excluido == false)
                     {                       
@@ -32,11 +34,9 @@
                             <td>@serie.Genero.ToString()</td>  
                             <td>@serie.Descricao</td>
                             <td>                                
-                                <BootstrapModal @ref="Modal" 
-                                Serie="serie_selecionada"
-                                AddSerie="AddSerie" EditarSerie="EditarSerie"/>                                    
+                                                                    
                                 
-                                <button @onclick="() => {Modal?.Open(1); serie_selecionada = serie;  }" class="btn btn-primary">Editar</button>
+                                <button type="submit" @onclick="() => {Modal?.Open(1); serie_selecionada = serie;  }" class="btn btn-primary">Editar</button>
                                 <button @onclick="() => excluirSerie(serie.Id)" class="btn btn-danger">Excluir</button>                                
                             </td>
                         </tr>    
@@ -54,16 +54,17 @@
 @code {
     private BootstrapModal? Modal { get; set; }
     public Serie serie_selecionada = new();    
-    public string? titulo { get; set; }
+    public string? titulo { get; set; }   
+
 
     public void excluirSerie(int id)
     {
-        serieRepositorio.Exclui(id);       
+        serieRepositorio.Exclui(id);                  
     }
 
     public void EditarSerie(Serie serie)
     {
-        serieRepositorio.Atualiza(serie.Id, serie);
+        serieRepositorio.Atualiza(serie.Id, serie);       
         StateHasChanged();
     }
 
@@ -72,6 +73,11 @@
         serie.Id = serieRepositorio.ProximoId();
         serieRepositorio.Insere(serie);
         StateHasChanged();
+    }
+
+    public List<Serie> ExibirSerie()
+    {
+        return serieRepositorio.Listar();
     }
 
 }
