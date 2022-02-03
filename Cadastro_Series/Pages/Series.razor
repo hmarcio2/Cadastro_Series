@@ -1,4 +1,4 @@
-﻿@page "/Series"
+﻿@page "/"
 @inject SerieRepositorio serieRepositorio;
 
 <div class="container col-12 align-content-center">
@@ -21,22 +21,20 @@
                 </tr>
               </thead>
               <tbody>    
-
-                @foreach(var serie in serieRepositorio.Listar())
+                <BootstrapModal @ref="Modal" 
+                            Serie="serie_selecionada"
+                            AddSerie="AddSerie" EditarSerie="EditarSerie"/>
+                @foreach(var serie in ExibirSerie())
                 {
                     @if(serie.Excluido == false)
                     {                       
                         <tr class="text-center">                            
                             <td>@serie.Titulo</td>
                             <td>@serie.Ano</td>  
-                            <td>@serie.Genero.ToString()</td>  
+                            <td>@serie.Genero.GetEnumDescription()</td>  
                             <td>@serie.Descricao</td>
-                            <td>                                
-                                <BootstrapModal @ref="Modal" 
-                                Serie="serie_selecionada"
-                                AddSerie="AddSerie" EditarSerie="EditarSerie"/>                                    
-                                
-                                <button @onclick="() => {Modal?.Open(1); serie_selecionada = serie;  }" class="btn btn-primary">Editar</button>
+                            <td>                                                                                                                                   
+                                <button @onclick="() => {Modal?.Open(1); serie_selecionada = new(serie.Id, serie.Genero, serie.Titulo, serie.Descricao, serie.Ano);}" class="btn btn-primary">Editar</button>
                                 <button @onclick="() => excluirSerie(serie.Id)" class="btn btn-danger">Excluir</button>                                
                             </td>
                         </tr>    
@@ -49,21 +47,20 @@
 </div>
 
 
-
-
 @code {
     private BootstrapModal? Modal { get; set; }
     public Serie serie_selecionada = new();    
-    public string? titulo { get; set; }
+    public string? titulo { get; set; }   
+
 
     public void excluirSerie(int id)
     {
-        serieRepositorio.Exclui(id);       
+        serieRepositorio.Exclui(id);                  
     }
 
     public void EditarSerie(Serie serie)
     {
-        serieRepositorio.Atualiza(serie.Id, serie);
+        serieRepositorio.Atualiza(serie.Id, serie);       
         StateHasChanged();
     }
 
@@ -72,6 +69,11 @@
         serie.Id = serieRepositorio.ProximoId();
         serieRepositorio.Insere(serie);
         StateHasChanged();
+    }
+    
+    public List<Serie> ExibirSerie()
+    {
+        return serieRepositorio.Listar();
     }
 
 }

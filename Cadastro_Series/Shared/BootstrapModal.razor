@@ -1,4 +1,4 @@
-﻿<div class="modal @ModalClass" tabindex="-1" role="dialog" style="display:@ModalDisplay">
+﻿<div class="modal @ModalClass" tabindex="-1" role="none" style="display:@ModalDisplay">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
 
@@ -15,64 +15,61 @@
                 </div>
             </div>
 
+
+            <EditForm Model="@Model" OnValidSubmit="FormSubmit">  
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+
             <div class="modal-body">
-                <div class="container ">
-                    <EditForm Model="@Model">
-                        <DataAnnotationsValidator/>
-                        <ValidationSummary/>
-                        <div class="form-group row col-12">
-                            <div class="col-8">
-                                <label class="col-form-label fw-bold  ">Titulo</label>
-                                <InputText class="form-control" @bind-Value="Serie.Titulo" placeholder="@Serie?.Titulo"/>    
-                                <ValidationMessage For="@(()=>Serie.Titulo)"/>
-                            </div>
-                            <div class="col-4">
-                                <label class="col-form-label fw-bold col-4">Ano</label>
-                                <InputNumber min="1900" max="2022" class="form-control" @bind-Value="Serie.Ano" placeholder="Serie?.Ano" TValue="Int32"/>                
-                                <ValidationMessage For="@(()=>Serie.Ano)"/>
-                            </div>            
+                <div class="container ">                    
+                    <div class="row col-12">                        
+                        <div class="col-8">
+                            <label for="Titulo" class="col-form-label fw-bold  ">Titulo</label>
+                            <InputText id="Titulo" style="width:100%;" class="form-control"  @bind-Value="Model.Titulo"/>                                    
                         </div>
+                            
+                        <div class="col-4">
+                            <label for="Ano" class="col-form-label fw-bold">Ano</label>
+                            <InputNumber id="Ano" style="width:100%;" class="form-control" @bind-Value="Model.Ano" TValue="Int32"/>
+                        </div>            
+                    </div>
 
-                        <div class="form-group row col-12 d-flex justify-content-center">
-                            <label class="col-form-label fw-bold">Genero</label>
-                                <InputSelect class="form-control" @bind-Value="@Serie.Genero">
-                                    @foreach(var genero in Enum.GetValues(typeof(Generos)))
+                    <div class="form-group row col-12">
+                        <label for="Genero" class="col-form-label fw-bold">Genero</label>
+                            <InputSelect id="Genero"  class="form-control" @bind-Value="@Model.Genero">
+                                <option value="0" selected> &lt -- Selecione um gênero -- &gt </option>
+                                @foreach(var genero in Enum.GetValues(typeof(Generos)))
+                                {
+                                    if(Model.Genero.ToString() == genero.ToString())
                                     {
-                                        if(Serie.Genero.ToString() == genero.ToString())
-                                        {
-                                            <option value="@genero" selected>@genero</option>
-                                        }
-                                        else
-                                        {
-                                            <option value="@genero">@genero</option>    
-                                        }
-                    
-                                    }            
-                                </InputSelect>            
-                        </div>
+                                        <option value="@genero" selected>@genero</option>
+                                    }
+                                    else
+                                    {                                            
+                                        <option value="@genero">@genero</option>                                                                                        
+                                    }                                           
+                                }            
+                            </InputSelect>            
+                    </div>
 
-                        <div class="form-group row col-12">
-                            <label class="col-form-label fw-bold">Descrição</label>
-                            <InputTextArea style="height:150px" class="form-control " @bind-Value="Serie.Descricao" placeholder="@Serie?.Descricao"/>
-                        </div>
-
-                    </EditForm>    
+                    <div class="form-group row col-12">
+                        <label for="Descricao" class="col-form-label fw-bold">Descrição</label>
+                        <InputTextArea id="Descricao" style="height:150px" class="form-control" @bind-Value="Model.Descricao"/>
+                    </div>                                                                  
                  </div>
             </div>
 
-            <div class="modal-footer">
-                @if(Categoria == 1)
-                {
-                    <button @onclick="()=>{EditarSerie.InvokeAsync(Serie); Close();}" type="button" class="btn btn-primary">Salvar</button>
-                }
-                else
-                {
-                    <button @onclick="()=>{AddSerie.InvokeAsync(Serie);Close();}" type="button" class="btn btn-primary">Salvar</button>
-                }                
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="() => Close()">Close</button>
-            </div>
+            <div class="modal-footer"> 
+                 <div class="row col-12 ">
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-primary mx-2" type="submit">Salvar</button>                                             
+                        <button class="btn btn-secondary mx-2" type="button"  @onclick=Close>Close</button>                    
+                    </div>                    
+                </div>
+            </div>    
+            
+            </EditForm>   
         </div>
-
     </div>
 </div>
 
@@ -85,7 +82,7 @@
 
 @code {
     [Parameter]
-    public Serie? Serie { get; set; }    
+    public Serie Serie { get; set; }    //no modo criar causa bug no EditForm
 
     [Parameter]
     public EventCallback<Serie> EditarSerie { get; set; }
@@ -93,29 +90,41 @@
     [Parameter]
     public EventCallback<Serie> AddSerie { get; set; }
 
-    public Serie Model = new Serie();
-    public int Categoria { get; set; }
+    //erie Model = new();
+    private Serie Model => Serie == null ? new Serie() : Serie; //Define Model para o EditForm
+    public int Categoria { get; set; } // 1 - Editar | 2 - Criar
+
+    //Propriedades iniciais do Modal
     public string ModalDisplay = "none;";
-    public string ModalClass = "";
+    public string ModalClass = " ";
     public bool ShowBackdrop = false;
 
-
     public void Open(int escolha)
-    {
+    {        
         ModalDisplay = "block;";
         ModalClass = "Show";
         ShowBackdrop = true;
-        Categoria = escolha;
-        StateHasChanged();              
+        Categoria = escolha;        
     }
 
     public void Close()
-    {
+    {       
         ModalDisplay = "none";
-        ModalClass = "";
+        ModalClass = " ";
         ShowBackdrop = false;
-        StateHasChanged();        
-    }   
-    
+    }
 
+    public void FormSubmit()
+    {        
+        if(Categoria == 1)
+        {
+            EditarSerie.InvokeAsync(Model);
+        }
+        else
+        {
+            AddSerie.InvokeAsync(Model);
+        }  
+        Close();  
+                         
+    }
 }

@@ -5,15 +5,17 @@ using System.ComponentModel.DataAnnotations;
 namespace Cadastro_Series.Models
 {
     public class Serie : EntidadeBase
-    {       
-        //atributos        
-        public Generos Genero { get; set; }
-        [Required]
-        [MaxLength(30)]
-        public string Titulo { get; set; }
+    {
+        //atributos
+        [Range(1,13,ErrorMessage = "O Campo Gênero é obrigatório")]
+        public Generos Genero { get; set; }        
+
+        [Required(ErrorMessage = "O título é obrigatório!")] 
+        [MinLength(1, ErrorMessage = "O nome da série deve ter no mínimo um caracter") ]
+        public string? Titulo { get; set; } 
         public string Descricao { get; set; }
-        [Required]
         
+        [Range(1895, 2022, ErrorMessage = "O ano deve está entre 1895 e 2022")]
         public int Ano { get; set; }
         public bool Excluido { get; set; }
 
