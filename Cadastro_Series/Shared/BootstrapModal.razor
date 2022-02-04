@@ -21,21 +21,24 @@
             <ValidationSummary/>
 
             <div class="modal-body">
-                <div class="container ">                    
-                    <div class="row col-12">                        
-                        <div class="col-8">
-                            <label for="Titulo" class="col-form-label fw-bold  ">Titulo</label>
-                            <InputText id="Titulo" style="width:100%;" class="form-control"  @bind-Value="Model.Titulo"/>                                    
+                <div class="container">                    
+
+                    <div class="d-flex justify-content-center">
+                        <div class="row form-group">                           
+                            <div class="col-8">
+                                <label for="Titulo" class="col-form-label fw-bold  ">Titulo</label>
+                                <InputText style="width:100%" id="Titulo" class="form-control"  @bind-Value="Model.Titulo"/>                                    
+                            </div>                                            
+                            <div class="col-4">
+                                <label for="Ano" class="col-form-label fw-bold">Ano</label>
+                                <InputNumber id="Ano" class="form-control" @bind-Value="Model.Ano" TValue="Int32"/>
+                            </div>            
                         </div>
-                            
-                        <div class="col-4">
-                            <label for="Ano" class="col-form-label fw-bold">Ano</label>
-                            <InputNumber id="Ano" style="width:100%;" class="form-control" @bind-Value="Model.Ano" TValue="Int32"/>
-                        </div>            
                     </div>
 
-                    <div class="form-group row col-12">
-                        <label for="Genero" class="col-form-label fw-bold">Genero</label>
+                    <div class="d-flex justify-content-center">
+                        <div class="row col-12">                        
+                            <label for="Genero" class="col-form-label fw-bold">Genero</label>
                             <InputSelect id="Genero"  class="form-control" @bind-Value="@Model.Genero">
                                 <option value="0" selected> &lt -- Selecione um gênero -- &gt </option>
                                 @foreach(var genero in Enum.GetValues(typeof(Generos)))
@@ -49,13 +52,17 @@
                                         <option value="@genero">@genero</option>                                                                                        
                                     }                                           
                                 }            
-                            </InputSelect>            
+                            </InputSelect>                                   
+                        </div>
                     </div>
 
-                    <div class="form-group row col-12">
-                        <label for="Descricao" class="col-form-label fw-bold">Descrição</label>
-                        <InputTextArea id="Descricao" style="height:150px" class="form-control" @bind-Value="Model.Descricao"/>
-                    </div>                                                                  
+                    <div class="d-flex justify-content-center">
+                        <div class="row col-12">
+                            <label for="Descricao" class="col-form-label fw-bold">Descrição</label>
+                            <InputTextArea id="Descricao" style="height:150px" class="form-control" @bind-Value="Model.Descricao"/>
+                        </div>  
+                    </div>
+
                  </div>
             </div>
 
